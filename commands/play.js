@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core-discord');
-const { MessageEmbed } = require('discord.js');
+const { createEmbed } = require('../utilities');
 
 const BOT_TIMEOUT = 60000;
 const WATERMARK = 1 << 25;
@@ -15,8 +15,11 @@ module.exports = {
             .setDescription('The YouTube URL of your song to play.')
             .setRequired(true)),
 	async execute(interaction) {
-        console.log(interaction.user.username)
-        var voiceChannel = interaction.member.voice.channel;
+        let voiceChannel = interaction.member.voice.channel;
+        if (!voiceChannel) {
+            await interaction.reply('You need to be in a voice channel first!');
+            return;
+        }
         let connection = getVoiceConnection(voiceChannel.guild.id);
         if (!connection) {
             connection = joinVoiceChannel({
@@ -34,7 +37,6 @@ module.exports = {
         const stream = await ytdl(url, { filter: 'audioonly', highWaterMark: WATERMARK });
         const videoInfo = await ytdl.getBasicInfo(url);
         const videoDetails = videoInfo.videoDetails;
-        console.log(videoInfo);
         const resource = createAudioResource(stream);
         const player = createAudioPlayer();
         player.on('error', error => {
@@ -50,31 +52,3 @@ module.exports = {
         await interaction.reply({ embeds: [embed] });
 	},
 };
-
-function createEmbed(videoDetails, requestedByUser, userAvatar) {
-    return new MessageEmbed()
-	.setColor('#001aff')
-	.setTitle(videoDetails.title)
-	.setAuthor('LionZH Music')
-	.setDescription('Now Playing')
-    .setURL(videoDetails.video_url)
-	.setThumbnail(videoDetails.thumbnails[0]['url'])
-	.addField('Length', secondsToHHMMSS(videoDetails.lengthSeconds), true)
-    .setTimestamp(new Date())
-	.setFooter(`Requested by ${requestedByUser}`, userAvatar);
-}
-
-function secondsToHHMMSS(secondsStr) {
-    var secondsInt = parseInt(secondsStr);
-    var hours = Math.floor(secondsInt / 3600);
-    var minutes = Math.floor(secondsInt / 60) % 60;
-    var seconds = secondsInt % 60;
-
-    if (hours > 0) {
-        return `${hours}:${minutes}:${seconds}`;
-    } else if (minutes > 0) {
-        return `${minutes}:${seconds}`
-    } else {
-        return `${seconds}`
-    }
-}
