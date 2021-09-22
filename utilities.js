@@ -4,17 +4,17 @@ var duration = require('dayjs/plugin/duration')
 dayjs.extend(duration);
 
 module.exports = {
-    createEmbed(videoDetails, requestedByUser, userAvatar) {
+    createEmbed(track) {
         return new MessageEmbed()
         .setColor('#001aff')
-        .setTitle(videoDetails.title)
+        .setTitle(track.title)
         .setAuthor('LionZH Music')
         .setDescription('Now Playing')
-        .setURL(videoDetails.video_url)
-        .setThumbnail(videoDetails.thumbnails[0]['url'])
-        .addField('Length', secondsToHHMMSS(videoDetails.lengthSeconds), true)
+        .setURL(track.url)
+        .setThumbnail(track.thumbnail)
+        .addField('Length', secondsToHHMMSS(track.length), true)
         .setTimestamp(new Date())
-        .setFooter(`Requested by ${requestedByUser}`, userAvatar);
+        .setFooter(`Requested by ${track.requester.username}`, track.requester.displayAvatarURL());
     }
 }
 
