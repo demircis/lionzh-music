@@ -43,7 +43,7 @@ module.exports = class MusicSubscription {
                 this.processQueue();
             }
         });
-/*         this.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
+        /*  this.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
             try {
                 await entersState(this.audioPlayer, AudioPlayerStatus.Playing, idleTimeout);
             } catch {
@@ -59,7 +59,28 @@ module.exports = class MusicSubscription {
     }
 
     async enqueue(track) {
-        this.queue.push(track);
+        const pos = this.queue.push(track);
+        await this.processQueue();
+        return pos;
+    }
+
+    pauseTrack() {
+        this.audioPlayer.pause();
+    }
+
+    resumeTrack() {
+        this.audioPlayer.unpause();
+    }
+
+    stopTrack() {
+        this.audioPlayer.stop();
+    }
+
+    async skipTrack() {
+        if (this.queue.length == 0) {
+            this.audioPlayer.stop(true);
+            return;
+        }
         await this.processQueue();
     }
 

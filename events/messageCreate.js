@@ -1,4 +1,4 @@
-const { play } = require('../playImpl');
+const { play, pause, resume, stop, leave } = require('../commandImpl');
 
 const prefix = '>';
 
@@ -15,6 +15,19 @@ module.exports = {
                     let url = args[1];
                     play(message, url);
                 }
+                return;
+            case 'pause':
+                pause(message.guildId);
+                return;
+            case 'resume':
+                resume(message.guildId);
+                return;
+            case 'stop':
+                stop(message.guildId);
+                return;
+            case 'leave':
+                leave(message.guildId);
+                return;
             default:
                 return;
         }

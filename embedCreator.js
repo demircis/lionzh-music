@@ -1,10 +1,11 @@
+const { AudioPlayerStatus } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
 const utilities = require('./utilities');
 
 module.exports = {
-    createTrackInfoEmbed(track) {
+    createTrackInfoEmbed(track, queuePos, status) {
         return new MessageEmbed()
-        .setAuthor('Now Playing')
+        .setAuthor((queuePos == 1 && status != AudioPlayerStatus.Playing) ? 'Now Playing' : 'Added to queue')
         .addField('Track', `**[${track.title}](${track.url})**`)
         .setThumbnail(track.thumbnail)
         .addField('Length', utilities.secondsToHHMMSS(track.length), true)
