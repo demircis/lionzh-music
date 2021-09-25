@@ -63,8 +63,8 @@ module.exports = {
             command.channel.send({ embeds: [embedCreator.createTrackInfoEmbed(track, queuePos, playerStatus)] });
         }
 	},
-    async pause(guildId) {
-        let subscription = subscriptions.get(guildId);
+    async pause(command) {
+        let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.pauseTrack();
         } else {
@@ -77,8 +77,8 @@ module.exports = {
             }
         }
     },
-    async resume(guildId) {
-        let subscription = subscriptions.get(guildId);
+    async resume(command) {
+        let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.resumeTrack();
         } else {
@@ -91,8 +91,8 @@ module.exports = {
             }
         }
     },
-    async stop(guildId) {
-        let subscription = subscriptions.get(guildId);
+    async stop(command) {
+        let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.stopTrack();
         } else {
@@ -105,11 +105,11 @@ module.exports = {
             }
         }
     },
-    async leave(guildId) {
-        let subscription = subscriptions.get(guildId);
+    async leave(command) {
+        let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.voiceConnection.destroy();
-            subscriptions.delete(guildId);
+            subscriptions.delete(command.guildId);
         } else {
             if (command instanceof Interaction) {
                 await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });

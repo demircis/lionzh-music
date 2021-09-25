@@ -12,6 +12,11 @@ module.exports = {
         .setTimestamp(new Date())
         .setFooter(`Requested by ${track.requester.username}`, track.requester.displayAvatarURL());
     },
+    createInfoMessageEmbed(infoMessage) {
+        return new MessageEmbed()
+        .setColor('#0000ff')
+        .setDescription(infoMessage);
+    },
     createErrorMessageEmbed(errorMessage) {
         return new MessageEmbed()
         .setColor('#ff0000')

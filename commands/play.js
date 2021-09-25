@@ -12,5 +12,5 @@ module.exports = {
 	async execute(interaction) {
         let url = interaction.options.get('url').value;
         play(interaction, url);
-	},
+	}
 };

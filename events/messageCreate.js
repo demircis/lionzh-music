@@ -17,16 +17,16 @@ module.exports = {
                 }
                 return;
             case 'pause':
-                pause(message.guildId);
+                pause(message);
                 return;
             case 'resume':
-                resume(message.guildId);
+                resume(message);
                 return;
             case 'stop':
-                stop(message.guildId);
+                stop(message);
                 return;
             case 'leave':
-                leave(message.guildId);
+                leave(message);
                 return;
             default:
                 return;
