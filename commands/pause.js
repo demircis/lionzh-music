@@ -8,6 +8,6 @@ module.exports = {
 		.setDescription('Pause the currently playing track.'),
 	async execute(interaction) {
         pause(interaction);
-		await interaction.reply({ embeds: [createInfoMessageEmbed('Paused playback.')]});
+		await interaction.reply({ embeds: [createInfoMessageEmbed('Paused playback.')] });
 	}
 };

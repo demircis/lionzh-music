@@ -12,26 +12,13 @@ module.exports = {
         let subscription = subscriptions.get(command.guildId);
         if (!subscription) {
             let voiceChannel = command.member.voice.channel;
-            if (command instanceof Interaction) {
-                let interaction = command;
-                if (!voiceChannel) {
-                    await interaction.reply({ embeds: [embedCreator.createErrorMessageEmbed('You need to be in a voice channel first!')] });
-                    return;
-                }
-                if (!interaction.member instanceof GuildMember) {
-                    await interaction.reply({ embeds: [embedCreator.createErrorMessageEmbed('You are not a member of this server!')] });
-                    return;
-                }
-            } else if (command instanceof Message) {
-                let message = command;
-                if (!voiceChannel) {
-                    message.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('You need to be in a voice channel first!')] });
-                    return;
-                }
-                if (!message.member instanceof GuildMember) {
-                    message.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('You are not a member of this server!')] });
-                    return;
-                }
+            if (!voiceChannel) {
+                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You need to be in a voice channel first!')], allowedMentions: {repliedUser: false} });
+                return;
+            }
+            if (!command.member instanceof GuildMember) {
+                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You are not a member of this server!')], allowedMentions: {repliedUser: false} });
+                return;
             }
             subscription = new MusicSubscription(joinVoiceChannel({
                 channelId: voiceChannel.id,
@@ -45,36 +32,22 @@ module.exports = {
             await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 5000);
         } catch(error) {
             console.log(error);
-            if (command instanceof Interaction) {
-                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Failed to connect to voice channel!')] });
-                return;
-            } else if (command instanceof Message) {
-                command.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('Failed to connect to voice channel!')] });
-                return;
-            }
+            await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Failed to connect to voice channel!')], allowedMentions: {repliedUser: false} });
+            return;
         }
         
         const track = await RequestedTrack.from(url, requester);
         const queuePos = await subscription.enqueue(track);
         const playerStatus = subscription.audioPlayer.state.status;
-        if (command instanceof Interaction) {
-            await command.reply({ embeds: [embedCreator.createTrackInfoEmbed(track, queuePos, playerStatus)] });
-        } else if (command instanceof Message) {
-            command.channel.send({ embeds: [embedCreator.createTrackInfoEmbed(track, queuePos, playerStatus)] });
-        }
+        await command.reply({ embeds: [embedCreator.createTrackInfoEmbed(track, queuePos, playerStatus)], allowedMentions: {repliedUser: false} });
 	},
     async pause(command) {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.pauseTrack();
         } else {
-            if (command instanceof Interaction) {
-                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            } else if (command instanceof Message) {
-                command.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            }
+            await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
+            return;
         }
     },
     async resume(command) {
@@ -82,13 +55,8 @@ module.exports = {
         if (subscription) {
             subscription.resumeTrack();
         } else {
-            if (command instanceof Interaction) {
-                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            } else if (command instanceof Message) {
-                command.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            }
+            await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
+            return;
         }
     },
     async stop(command) {
@@ -96,13 +64,8 @@ module.exports = {
         if (subscription) {
             subscription.stopTrack();
         } else {
-            if (command instanceof Interaction) {
-                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            } else if (command instanceof Message) {
-                command.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            }
+            await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
+            return;
         }
     },
     async leave(command) {
@@ -111,13 +74,8 @@ module.exports = {
             subscription.voiceConnection.destroy();
             subscriptions.delete(command.guildId);
         } else {
-            if (command instanceof Interaction) {
-                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            } else if (command instanceof Message) {
-                command.channel.send({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')] });
-                return;
-            }
+            await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
+            return;
         }
     }
 }
