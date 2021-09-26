@@ -72,15 +72,8 @@ module.exports = class MusicSubscription {
         this.audioPlayer.unpause();
     }
 
-    stopTrack() {
-        this.audioPlayer.stop();
-    }
-
     async skipTrack() {
-        if (this.queue.length == 0) {
-            this.audioPlayer.stop(true);
-            return;
-        }
+        this.audioPlayer.stop();
         await this.processQueue();
     }
 

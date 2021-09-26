@@ -45,6 +45,7 @@ module.exports = {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.pauseTrack();
+            await command.reply({ embeds: [createInfoMessageEmbed('Paused playback.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;
@@ -54,15 +55,17 @@ module.exports = {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.resumeTrack();
+            await command.reply({ embeds: [createInfoMessageEmbed('Resumed playback.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;
         }
     },
-    async stop(command) {
+    async skip(command) {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
-            subscription.stopTrack();
+            subscription.skipTrack();
+            await command.reply({ embeds: [createInfoMessageEmbed('Skipped to next track.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;
@@ -73,6 +76,7 @@ module.exports = {
         if (subscription) {
             subscription.voiceConnection.destroy();
             subscriptions.delete(command.guildId);
+            await command.reply({ embeds: [createInfoMessageEmbed('Left channel.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;

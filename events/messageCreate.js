@@ -1,4 +1,4 @@
-const { play, pause, resume, stop, leave } = require('../commandImpl');
+const { play, pause, resume, stop, leave, skip } = require('../commandImpl');
 const { createInfoMessageEmbed } = require('../embedCreator');
 
 const prefix = '>';
@@ -19,19 +19,15 @@ module.exports = {
                 return;
             case 'pause':
                 pause(message);
-                await message.reply({ embeds: [createInfoMessageEmbed('Paused playback.')], allowedMentions: {repliedUser: false} });
                 return;
             case 'resume':
                 resume(message);
-                await message.reply({ embeds: [createInfoMessageEmbed('Resumed playback.')], allowedMentions: {repliedUser: false} });
                 return;
-            case 'stop':
-                stop(message);
-                await message.reply({ embeds: [createInfoMessageEmbed('Stopped playback (track removed).')], allowedMentions: {repliedUser: false} });
+            case 'skip':
+                skip(message);
                 return;
             case 'leave':
                 leave(message);
-                await message.reply({ embeds: [createInfoMessageEmbed('Left channel.')], allowedMentions: {repliedUser: false} });
                 return;
             default:
                 return;
