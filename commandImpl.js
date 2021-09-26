@@ -1,4 +1,4 @@
-const { Interaction, Message, GuildMember } = require("discord.js");
+const { Interaction, GuildMember } = require("discord.js");
 const { joinVoiceChannel, entersState, VoiceConnectionStatus } = require('@discordjs/voice');
 const MusicSubscription = require('./musicSubscription');
 const RequestedTrack = require('./requestedTrack');
@@ -45,7 +45,7 @@ module.exports = {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.pauseTrack();
-            await command.reply({ embeds: [createInfoMessageEmbed('Paused playback.')], allowedMentions: {repliedUser: false} });
+            await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Paused playback.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;
@@ -55,7 +55,7 @@ module.exports = {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
             subscription.resumeTrack();
-            await command.reply({ embeds: [createInfoMessageEmbed('Resumed playback.')], allowedMentions: {repliedUser: false} });
+            await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Resumed playback.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;
@@ -64,8 +64,14 @@ module.exports = {
     async skip(command) {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
-            subscription.skipTrack();
-            await command.reply({ embeds: [createInfoMessageEmbed('Skipped to next track.')], allowedMentions: {repliedUser: false} });
+            await subscription.skipTrack();
+            const nextTrack = subscription.nextTrack;
+            console.log(nextTrack);
+            if (!nextTrack) {
+                await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Skipped track.')], allowedMentions: {repliedUser: false} });
+            } else {
+                await command.reply({ embeds: [embedCreator.createInfoMessageEmbed(`Skipped to next track: ${nextTrack.title}.`)], allowedMentions: {repliedUser: false} });
+            }
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;
@@ -76,7 +82,7 @@ module.exports = {
         if (subscription) {
             subscription.voiceConnection.destroy();
             subscriptions.delete(command.guildId);
-            await command.reply({ embeds: [createInfoMessageEmbed('Left channel.')], allowedMentions: {repliedUser: false} });
+            await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Left channel.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
             return;

@@ -1,12 +1,13 @@
 const { createAudioPlayer, AudioPlayerStatus, VoiceConnectionStatus, entersState, VoiceConnectionDisconnectReason } = require('@discordjs/voice');
 
-const idleTimeout = 15e3;
 const waitTimeout = 5e3;
 
 module.exports = class MusicSubscription {
     voiceConnection;
     audioPlayer;
     queue;
+    queueLock = false;
+    nextTrack = null;
 
     constructor(voiceConnection) {
         this.voiceConnection = voiceConnection;
@@ -43,13 +44,6 @@ module.exports = class MusicSubscription {
                 this.processQueue();
             }
         });
-        /*  this.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
-            try {
-                await entersState(this.audioPlayer, AudioPlayerStatus.Playing, idleTimeout);
-            } catch {
-                this.voiceConnection.disconnect();
-            }
-        }); */
         this.audioPlayer.on('error', error => {
             console.error(error);
         });
@@ -59,6 +53,7 @@ module.exports = class MusicSubscription {
     }
 
     async enqueue(track) {
+        this.nextTrack = track;
         const pos = this.queue.push(track);
         await this.processQueue();
         return pos;
@@ -73,26 +68,31 @@ module.exports = class MusicSubscription {
     }
 
     async skipTrack() {
-        this.audioPlayer.stop();
-        await this.processQueue();
+        this.audioPlayer.stop(true);
     }
 
     stop() {
+        this.queueLock = true;
         this.queue = [];
         this.audioPlayer.stop(true);
     }
 
     async processQueue() {
-        if (this.audioPlayer.state.status != AudioPlayerStatus.Idle || this.queue.length == 0) {
-            return;
+        if (this.queueLock || this.audioPlayer.state.status != AudioPlayerStatus.Idle || this.queue.length == 0) {
+            return null;
         }
+
+        this.queueLock = true;
 
         const track = this.queue.shift();
         try {
             const resource = await track.createAudioResource();
             this.audioPlayer.play(resource);
+            this.queueLock = false;
+            return track;
         } catch(error) {
             console.log(error);
+            this.queueLock = false;
             await this.processQueue();
         }
         
