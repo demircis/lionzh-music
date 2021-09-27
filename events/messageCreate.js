@@ -1,4 +1,4 @@
-const { play, pause, resume, stop, leave, skip } = require('../commandImpl');
+const { play, pause, resume, leave, skip } = require('../commands');
 const yts = require('yt-search');
 
 const prefix = '>';

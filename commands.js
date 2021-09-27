@@ -6,7 +6,7 @@ const embedCreator = require('./embedCreator');
 const yts = require('yt-search');
 
 const subscriptions = new Map();
-const idleTimeout = 60e3;
+const idleTimeout = 300e3;
 
 module.exports = {
     async play(command, args) {
@@ -22,21 +22,7 @@ module.exports = {
                 await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You are not a member of this server!')], allowedMentions: {repliedUser: false} });
                 return;
             }
-            subscription = new MusicSubscription(joinVoiceChannel({
-                channelId: voiceChannel.id,
-                guildId: voiceChannel.guild.id,
-                adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-            }));
-            subscription.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
-                try {
-                    await entersState(subscription.audioPlayer, AudioPlayerStatus.Playing, idleTimeout);
-                } catch {
-                    if (subscription.voiceConnection.state.status != VoiceConnectionStatus.Destroyed) {
-                        subscription.voiceConnection.destroy();
-                    }
-                    subscriptions.delete(command.guildId);
-                }
-            });
+            subscription = createAndSetupMusicSubscription(voiceChannel);
             subscriptions.set(command.guildId, subscription);
         } else {
             if (subscription && (subscription.voiceConnection.joinConfig.channelId != command.member.voice.channelId)) {
@@ -53,25 +39,10 @@ module.exports = {
             return;
         }
 
-        let url = '';
-        if (args.length > 1 && args[1].startsWith('https://www.youtube.com')) {
-            url = args[1];
-        } else if (args.length > 1) {
-            let search = '';
-            args.slice(1).forEach(element => {
-                search = search.concat(element, ' ');
-            });
-            try {
-                const r = await yts(search.trimEnd());
-                if (r.videos.length > 0) {
-                    url = r.videos[0].url
-                } else {
-                    await message.reply({ embeds: [embedCreator.createErrorMessageEmbed(`No videos found for ${search.trimEnd()}!`)], allowedMentions: {repliedUser: false} });
-                    return;
-                }
-            } catch(error) {
-                console.error(error);
-            }
+        const url = await obtainVideoUrl(args);
+        if (!url) {
+            await message.reply({ embeds: [embedCreator.createErrorMessageEmbed(`No videos found for ${search.trimEnd()}!`)], allowedMentions: {repliedUser: false} });
+            return;
         }
 
         const track = await RequestedTrack.from(url, requester);
@@ -86,7 +57,6 @@ module.exports = {
             await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Paused playback.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
-            return;
         }
     },
     async resume(command) {
@@ -96,7 +66,6 @@ module.exports = {
             await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Resumed playback.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
-            return;
         }
     },
     async skip(command) {
@@ -111,7 +80,6 @@ module.exports = {
             }
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
-            return;
         }
     },
     async leave(command) {
@@ -122,7 +90,46 @@ module.exports = {
             await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Left channel.')], allowedMentions: {repliedUser: false} });
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
-            return;
+        }
+    }
+}
+
+function createAndSetupMusicSubscription(voiceChannel) {
+    const subscription = new MusicSubscription(joinVoiceChannel({
+        channelId: voiceChannel.id,
+        guildId: voiceChannel.guild.id,
+        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+    }));
+    subscription.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
+        try {
+            await entersState(subscription.audioPlayer, AudioPlayerStatus.Playing, idleTimeout);
+        } catch {
+            if (subscription.voiceConnection.state.status != VoiceConnectionStatus.Destroyed) {
+                subscription.voiceConnection.destroy();
+            }
+            subscriptions.delete(command.guildId);
+        }
+    });
+    return subscription;
+}
+
+async function obtainVideoUrl(args) {
+    if (args.length > 1 && args[1].startsWith('https://www.youtube.com')) {
+        return args[1];
+    } else if (args.length > 1) {
+        let search = '';
+        args.slice(1).forEach(element => {
+            search = search.concat(element, ' ');
+        });
+        try {
+            const r = await yts(search.trimEnd());
+            if (r.videos.length > 0) {
+                return r.videos[0].url
+            } else {
+                return null;
+            }
+        } catch(error) {
+            console.error(error);
         }
     }
 }

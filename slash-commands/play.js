@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { play } =require('../commandImpl');
+const { play } =require('../commands');
 
 module.exports = {
 	data: new SlashCommandBuilder()

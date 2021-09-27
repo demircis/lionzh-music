@@ -14,7 +14,8 @@
             "program": "${workspaceFolder}/deploy-commands.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ]
+            ],
+            "console": "integratedTerminal"
         },
         {
             "type": "pwa-node",

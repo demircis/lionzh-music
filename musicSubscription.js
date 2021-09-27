@@ -1,6 +1,6 @@
 const { createAudioPlayer, AudioPlayerStatus, VoiceConnectionStatus, entersState, VoiceConnectionDisconnectReason } = require('@discordjs/voice');
 
-const waitTimeout = 5e3;
+const waitTimeout = 15e3;
 
 module.exports = class MusicSubscription {
     voiceConnection;
@@ -78,6 +78,7 @@ module.exports = class MusicSubscription {
 
     async processQueue() {
         this.nextTrack = this.queue.length != 0 ? this.queue[0] : null;
+
         if (this.queueLock || this.audioPlayer.state.status != AudioPlayerStatus.Idle || this.queue.length == 0) {
             return;
         }

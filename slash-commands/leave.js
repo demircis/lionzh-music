@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { leave } =require('../commandImpl');
+const { leave } =require('../commands');
 const { createInfoMessageEmbed } = require('../embedCreator');
 
 module.exports = {
