@@ -1,10 +1,11 @@
 const { Interaction, GuildMember } = require("discord.js");
-const { joinVoiceChannel, entersState, VoiceConnectionStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, entersState, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const MusicSubscription = require('./musicSubscription');
 const RequestedTrack = require('./requestedTrack');
 const embedCreator = require('./embedCreator');
 
 const subscriptions = new Map();
+const idleTimeout = 60e3;
 
 module.exports = {
     async play(command, url) {
@@ -25,6 +26,16 @@ module.exports = {
                 guildId: voiceChannel.guild.id,
                 adapterCreator: voiceChannel.guild.voiceAdapterCreator,
             }));
+            subscription.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
+                try {
+                    await entersState(subscription.audioPlayer, AudioPlayerStatus.Playing, idleTimeout);
+                } catch {
+                    if (subscription.voiceConnection.state.status != VoiceConnectionStatus.Destroyed) {
+                        subscription.voiceConnection.destroy();
+                    }
+                    subscriptions.delete(command.guildId);
+                }
+            });
             subscriptions.set(command.guildId, subscription);
         }
 
@@ -70,7 +81,7 @@ module.exports = {
             if (!nextTrack) {
                 await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Skipped track.')], allowedMentions: {repliedUser: false} });
             } else {
-                await command.reply({ embeds: [embedCreator.createInfoMessageEmbed(`Skipped to next track: ${nextTrack.title}.`)], allowedMentions: {repliedUser: false} });
+                await command.reply({ embeds: [embedCreator.createInfoMessageEmbed(`Skipped to next track in queue: ${nextTrack.title}.`)], allowedMentions: {repliedUser: false} });
             }
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
