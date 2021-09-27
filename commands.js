@@ -22,7 +22,7 @@ module.exports = {
                 await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You are not a member of this server!')], allowedMentions: {repliedUser: false} });
                 return;
             }
-            subscription = createAndSetupMusicSubscription(voiceChannel);
+            subscription = createAndSetupMusicSubscription(voiceChannel, command.guildId);
             subscriptions.set(command.guildId, subscription);
         } else {
             if (subscription && (subscription.voiceConnection.joinConfig.channelId != command.member.voice.channelId)) {
@@ -94,7 +94,7 @@ module.exports = {
     }
 }
 
-function createAndSetupMusicSubscription(voiceChannel) {
+function createAndSetupMusicSubscription(voiceChannel, guildId) {
     const subscription = new MusicSubscription(joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: voiceChannel.guild.id,
@@ -107,7 +107,7 @@ function createAndSetupMusicSubscription(voiceChannel) {
             if (subscription.voiceConnection.state.status != VoiceConnectionStatus.Destroyed) {
                 subscription.voiceConnection.destroy();
             }
-            subscriptions.delete(command.guildId);
+            subscriptions.delete(guildId);
         }
     });
     return subscription;
