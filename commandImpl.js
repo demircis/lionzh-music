@@ -3,16 +3,17 @@ const { joinVoiceChannel, entersState, VoiceConnectionStatus, AudioPlayerStatus 
 const MusicSubscription = require('./musicSubscription');
 const RequestedTrack = require('./requestedTrack');
 const embedCreator = require('./embedCreator');
+const yts = require('yt-search');
 
 const subscriptions = new Map();
 const idleTimeout = 60e3;
 
 module.exports = {
-    async play(command, url) {
-        let requester = command instanceof Interaction ? command.user : command.author;
+    async play(command, args) {
+        const requester = command instanceof Interaction ? command.user : command.author;
         let subscription = subscriptions.get(command.guildId);
         if (!subscription) {
-            let voiceChannel = command.member.voice.channel;
+            const voiceChannel = command.member.voice.channel;
             if (!voiceChannel) {
                 await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You need to be in a voice channel first!')], allowedMentions: {repliedUser: false} });
                 return;
@@ -51,7 +52,28 @@ module.exports = {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Failed to connect to voice channel!')], allowedMentions: {repliedUser: false} });
             return;
         }
-        
+
+        let url = '';
+        if (args.length > 1 && args[1].startsWith('https://www.youtube.com')) {
+            url = args[1];
+        } else if (args.length > 1) {
+            let search = '';
+            args.slice(1).forEach(element => {
+                search = search.concat(element, ' ');
+            });
+            try {
+                const r = await yts(search.trimEnd());
+                if (r.videos.length > 0) {
+                    url = r.videos[0].url
+                } else {
+                    await message.reply({ embeds: [embedCreator.createErrorMessageEmbed(`No videos found for ${search.trimEnd()}!`)], allowedMentions: {repliedUser: false} });
+                    return;
+                }
+            } catch(error) {
+                console.error(error);
+            }
+        }
+
         const track = await RequestedTrack.from(url, requester);
         const queuePos = await subscription.enqueue(track);
         const playerStatus = subscription.audioPlayer.state.status;
@@ -82,7 +104,6 @@ module.exports = {
         if (subscription) {
             await subscription.skipTrack();
             const nextTrack = subscription.nextTrack;
-            console.log(nextTrack);
             if (!nextTrack) {
                 await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Skipped track.')], allowedMentions: {repliedUser: false} });
             } else {

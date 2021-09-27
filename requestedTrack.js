@@ -23,7 +23,7 @@ module.exports = class RequestedTrack {
             const stream = await ytdl(this.url, { filter: 'audioonly', highWaterMark: watermark });
             return createAudioResource(stream);
         } catch(error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
@@ -32,7 +32,7 @@ module.exports = class RequestedTrack {
             const info = await ytdl.getBasicInfo(url);
             return new RequestedTrack(url, info.videoDetails.title, info.videoDetails.lengthSeconds, info.videoDetails.thumbnails[0]['url'], requester);
         } catch(error) {
-            console.log(error);
+            console.error(error);
         }
     }
 }

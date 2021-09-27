@@ -1,4 +1,5 @@
 const { play, pause, resume, stop, leave, skip } = require('../commandImpl');
+const yts = require('yt-search');
 
 const prefix = '>';
 
@@ -11,10 +12,7 @@ module.exports = {
         const args = message.content.slice(prefix.length).trim().split(/ +/);
         switch(args[0]) {
             case 'play':
-                if (args.length > 1 && args[1].startsWith('https://www.youtube.com')) {
-                    let url = args[1];
-                    play(message, url);
-                }
+                play(message, args);
                 return;
             case 'pause':
                 pause(message);

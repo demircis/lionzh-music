@@ -91,7 +91,7 @@ module.exports = class MusicSubscription {
             this.queueLock = false;
             return;
         } catch(error) {
-            console.log(error);
+            console.error(error);
             this.queueLock = false;
             await this.processQueue();
         }

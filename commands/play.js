@@ -4,13 +4,15 @@ const { play } =require('../commandImpl');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription('Plays a song specified by given URL!')
+		.setDescription('Enter the YouTube URL or the song title.')
         .addStringOption(option =>
-            option.setName('url')
-            .setDescription('The YouTube URL of your song to play.')
+            option.setName('query')
+            .setDescription('The YouTube URL or the title of your song to play.')
             .setRequired(true)),
 	async execute(interaction) {
-        let url = interaction.options.get('url').value;
-        play(interaction, url);
+        const query = interaction.options.get('query').value;
+        const args = query.trim().split(/ +/);
+        console.log(args);
+        play(interaction, args);
 	}
 };
