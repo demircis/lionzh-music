@@ -53,7 +53,6 @@ module.exports = class MusicSubscription {
     }
 
     async enqueue(track) {
-        this.nextTrack = track;
         const pos = this.queue.push(track);
         await this.processQueue();
         return pos;
@@ -78,8 +77,9 @@ module.exports = class MusicSubscription {
     }
 
     async processQueue() {
+        this.nextTrack = this.queue.length != 0 ? this.queue[0] : null;
         if (this.queueLock || this.audioPlayer.state.status != AudioPlayerStatus.Idle || this.queue.length == 0) {
-            return null;
+            return;
         }
 
         this.queueLock = true;
@@ -89,7 +89,7 @@ module.exports = class MusicSubscription {
             const resource = await track.createAudioResource();
             this.audioPlayer.play(resource);
             this.queueLock = false;
-            return track;
+            return;
         } catch(error) {
             console.log(error);
             this.queueLock = false;

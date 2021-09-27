@@ -1,5 +1,4 @@
 const { play, pause, resume, stop, leave, skip } = require('../commandImpl');
-const { createInfoMessageEmbed } = require('../embedCreator');
 
 const prefix = '>';
 
