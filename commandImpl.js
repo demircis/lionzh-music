@@ -37,6 +37,11 @@ module.exports = {
                 }
             });
             subscriptions.set(command.guildId, subscription);
+        } else {
+            if (subscription && (subscription.voiceConnection.joinConfig.channelId != command.member.voice.channelId)) {
+                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is already playing in other channel!')], allowedMentions: {repliedUser: false} });
+                return;
+            }
         }
 
         try {
