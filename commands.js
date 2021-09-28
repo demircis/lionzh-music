@@ -39,9 +39,10 @@ module.exports = {
             return;
         }
 
-        const url = await obtainVideoUrl(args);
+        const query = await obtainVideoUrl(args);
+        const url = query.url;
         if (!url) {
-            await message.reply({ embeds: [embedCreator.createErrorMessageEmbed(`No videos found for ${search.trimEnd()}!`)], allowedMentions: {repliedUser: false} });
+            await message.reply({ embeds: [embedCreator.createErrorMessageEmbed(`No videos found for ${query.search}!`)], allowedMentions: {repliedUser: false} });
             return;
         }
 
@@ -124,7 +125,7 @@ async function obtainVideoUrl(args) {
         try {
             const r = await yts(search.trimEnd());
             if (r.videos.length > 0) {
-                return r.videos[0].url
+                return { url: r.videos[0].url, search: search.trimEnd() };
             } else {
                 return null;
             }
