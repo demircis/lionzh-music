@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { play } =require('../commands');
+const { play } = require('../commands');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,7 +12,6 @@ module.exports = {
 	async execute(interaction) {
         const query = interaction.options.get('query').value;
         const args = query.trim().split(/ +/);
-        console.log(args);
         play(interaction, args);
 	}
 };

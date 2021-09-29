@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { resume } =require('../commands');
-const { createInfoMessageEmbed } = require('../embedCreator');
+const { resume } = require('../commands');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,6 +7,5 @@ module.exports = {
 		.setDescription('Resume the currently paused track.'),
 	async execute(interaction) {
         resume(interaction);
-		await interaction.reply({ embeds: [createInfoMessageEmbed('Resumed playback.')]});
 	}
 };
