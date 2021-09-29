@@ -1,12 +1,12 @@
 const { play, pause, resume, leave, skip, help, changePrefix, queue } = require('../commands');
-
-var prefix = '>';
+const { getPrefix, setPrefix } = require('../prefix');
 
 module.exports = {
     name: 'messageCreate',
     async execute(message) {
         if (!message.guild) return;
 
+        const prefix = getPrefix();
         if (!message.content.startsWith(prefix) || message.author.bot) return;
         const args = message.content.slice(prefix.length).trim().split(/ +/);
         switch(args[0]) {
@@ -31,11 +31,11 @@ module.exports = {
             case 'prefix':
                 const newPrefix = await changePrefix(message, args);
                 if (newPrefix) {
-                    prefix = newPrefix;
+                    setPrefix(newPrefix);
                 }
                 return;
             case 'help':
-                await help(message, prefix);
+                await help(message);
                 return;
             default:
                 return;

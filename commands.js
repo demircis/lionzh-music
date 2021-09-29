@@ -117,9 +117,9 @@ module.exports = {
             return null;
         }
     },
-    async help(command, prefix) {
+    async help(command) {
         const botAvatarURL = command.client.user.defaultAvatarURL;
-        await command.reply({ embeds: [embedCreator.createHelpEmbed(botAvatarURL, prefix)], allowedMentions: {repliedUser: false} });
+        await command.reply({ embeds: [embedCreator.createHelpEmbed(botAvatarURL)], allowedMentions: {repliedUser: false} });
     }
 }
 

@@ -1,5 +1,6 @@
 const { AudioPlayerStatus } = require('@discordjs/voice');
 const { MessageEmbed } = require('discord.js');
+const { getPrefix } = require('./prefix');
 const utilities = require('./utilities');
 
 module.exports = {
@@ -25,7 +26,8 @@ module.exports = {
         .setAuthor('Queue', clientAvatarURL)
         .addField(queue.length == 1 ? 'Next track' : `Next ${queue.length} tracks`, titles);
     },
-    createHelpEmbed(clientAvatarURL, prefix) {
+    createHelpEmbed(clientAvatarURL) {
+        const prefix = getPrefix();
         return new MessageEmbed()
         .setAuthor('LionZH Music commands', clientAvatarURL)
         .addFields(
@@ -33,6 +35,7 @@ module.exports = {
             { name: `${prefix}pause`, value: 'Pauses the current track.' },
             { name: `${prefix}resume`, value: 'Resumes the current track.' },
             { name: `${prefix}skip`, value: 'Skips to the next track in queue.' },
+            { name: `${prefix}queue`, value: 'Show up to 5 next tracks in queue.'},
             { name: `${prefix}leave`, value: 'Leaves the voice channel.' },
             { name: `${prefix}prefix`, value: 'Changes the prefix to a new one (Only possible for Administrators).' }
         );
