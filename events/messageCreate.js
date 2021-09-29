@@ -1,4 +1,4 @@
-const { play, pause, resume, leave, skip, help, changePrefix } = require('../commands');
+const { play, pause, resume, leave, skip, help, changePrefix, queue } = require('../commands');
 
 var prefix = '>';
 
@@ -24,6 +24,9 @@ module.exports = {
                 return;
             case 'leave':
                 await leave(message);
+                return;
+            case 'queue':
+                await queue(message);
                 return;
             case 'prefix':
                 const newPrefix = await changePrefix(message, args);

@@ -1,5 +1,7 @@
 const { createAudioPlayer, AudioPlayerStatus, VoiceConnectionStatus, entersState, VoiceConnectionDisconnectReason } = require('@discordjs/voice');
 
+const DEBUG = true;
+
 const waitTimeout = 15e3;
 
 module.exports = class MusicSubscription {
@@ -12,7 +14,7 @@ module.exports = class MusicSubscription {
     constructor(voiceConnection) {
         this.voiceConnection = voiceConnection;
         this.voiceConnection.on('stateChange', async (oldState, newState) => {
-            console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
+            DEBUG && console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
             if (newState.status == VoiceConnectionStatus.Disconnected) {
                 if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
                     try {
@@ -39,7 +41,7 @@ module.exports = class MusicSubscription {
         
         this.audioPlayer = createAudioPlayer();
         this.audioPlayer.on('stateChange', (oldState, newState) => {
-            console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
+            DEBUG && console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
             if (oldState.status != AudioPlayerStatus.Idle && newState.status == AudioPlayerStatus.Idle) {
                 this.processQueue();
             }

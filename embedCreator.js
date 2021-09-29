@@ -16,6 +16,15 @@ module.exports = {
         }
         return embed;
     },
+    createQueueEmbed(queue, clientAvatarURL) {
+        const titles = queue
+				.slice(0, 5)
+				.map((track, index) => `${index + 1}) ${track.title}`)
+				.join('\n');
+        return new MessageEmbed()
+        .setAuthor('Queue', clientAvatarURL)
+        .addField(queue.length == 1 ? 'Next track' : `Next ${queue.length} tracks`, titles);
+    },
     createHelpEmbed(clientAvatarURL, prefix) {
         return new MessageEmbed()
         .setAuthor('LionZH Music commands', clientAvatarURL)
@@ -26,11 +35,11 @@ module.exports = {
             { name: `${prefix}skip`, value: 'Skips to the next track in queue.' },
             { name: `${prefix}leave`, value: 'Leaves the voice channel.' },
             { name: `${prefix}prefix`, value: 'Changes the prefix to a new one (Only possible for Administrators).' }
-        )
+        );
     },
     createInfoMessageEmbed(infoMessage) {
         return new MessageEmbed()
-        .setColor('#0000ff')
+        .setColor('#2abd62')
         .setDescription(infoMessage);
     },
     createErrorMessageEmbed(errorMessage) {

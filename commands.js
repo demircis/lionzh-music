@@ -84,6 +84,15 @@ module.exports = {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
         }
     },
+    async queue(command) {
+        let subscription = subscriptions.get(command.guildId);
+        if (!subscription || subscription.queue.length == 0) {
+            await command.reply({ embeds: [embedCreator.createInfoMessageEmbed('Queue is empty.')], allowedMentions: {repliedUser: false} });
+        } else {
+            const botAvatarURL = command.client.user.defaultAvatarURL;
+            await command.reply({ embeds: [embedCreator.createQueueEmbed(subscription.queue, botAvatarURL)], allowedMentions: {repliedUser: false} });
+        }
+    },
     async leave(command) {
         let subscription = subscriptions.get(command.guildId);
         if (subscription) {
