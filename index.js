@@ -2,11 +2,15 @@
 const fs = require('fs');
 const { Client, Intents, Collection } = require('discord.js');
 const { token } = require('./config.json');
-const { getPrefix } = require('./prefix');
+const { eventEmitter, getPrefix } = require('./prefix');
 
 // Create a new client instance
 const activity = { name: `${getPrefix()}help`, type: 'LISTENING' };
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGES], presence: { activities: [activity] } });
+
+eventEmitter.on('updatePrefix', (newPrefix) => {
+	client.user.setPresence({ activities: [{ name: `${newPrefix}help`, type: 'LISTENING' }] });
+});
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./slash-commands').filter(file => file.endsWith('.js'));
