@@ -16,6 +16,18 @@ module.exports = {
         }
         return embed;
     },
+    createHelpEmbed(clientAvatarURL, prefix) {
+        return new MessageEmbed()
+        .setAuthor('LionZH Music commands', clientAvatarURL)
+        .addFields(
+            { name: `${prefix}play`, value: `Plays a track from YouTube.\nExamples:\n${prefix}play michael jackson billie jean\n${prefix}play https://www.youtube.com/watch?v=dQw4w9WgXcQ` },
+            { name: `${prefix}pause`, value: 'Pauses the current track.' },
+            { name: `${prefix}resume`, value: 'Resumes the current track.' },
+            { name: `${prefix}skip`, value: 'Skips to the next track in queue.' },
+            { name: `${prefix}leave`, value: 'Leaves the voice channel.' },
+            { name: `${prefix}prefix`, value: 'Changes the prefix to a new one (Only possible for Administrators).' }
+        )
+    },
     createInfoMessageEmbed(infoMessage) {
         return new MessageEmbed()
         .setColor('#0000ff')

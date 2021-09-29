@@ -4,6 +4,7 @@ const MusicSubscription = require('./musicSubscription');
 const RequestedTrack = require('./requestedTrack');
 const embedCreator = require('./embedCreator');
 const yts = require('yt-search');
+const { Permissions } = require('discord.js');
 
 const subscriptions = new Map();
 const idleTimeout = 300e3;
@@ -92,6 +93,24 @@ module.exports = {
         } else {
             await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('Bot is not playing in this server!')], allowedMentions: {repliedUser: false} });
         }
+    },
+    async changePrefix(command, args) {
+        if (command.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+            if (args.length != 2) {
+                await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You need to specify a new, single-word prefix!')], allowedMentions: {repliedUser: false} });
+                return null;
+            }
+            const newPrefix = args[1];
+            await command.reply({ embeds: [embedCreator.createInfoMessageEmbed(`Successfully changed prefix to ${newPrefix}`)], allowedMentions: {repliedUser: false} });
+            return newPrefix;
+        } else {
+            await command.reply({ embeds: [embedCreator.createErrorMessageEmbed('You need to be an Administrator to change the prefix!')], allowedMentions: {repliedUser: false} });
+            return null;
+        }
+    },
+    async help(command, prefix) {
+        const botAvatarURL = command.client.user.defaultAvatarURL;
+        await command.reply({ embeds: [embedCreator.createHelpEmbed(botAvatarURL, prefix)], allowedMentions: {repliedUser: false} });
     }
 }
 

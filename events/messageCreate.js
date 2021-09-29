@@ -1,7 +1,6 @@
-const { play, pause, resume, leave, skip } = require('../commands');
-const yts = require('yt-search');
+const { play, pause, resume, leave, skip, help, changePrefix } = require('../commands');
 
-const prefix = '>';
+var prefix = '>';
 
 module.exports = {
     name: 'messageCreate',
@@ -12,19 +11,28 @@ module.exports = {
         const args = message.content.slice(prefix.length).trim().split(/ +/);
         switch(args[0]) {
             case 'play':
-                play(message, args);
+                await play(message, args);
                 return;
             case 'pause':
-                pause(message);
+                await pause(message);
                 return;
             case 'resume':
-                resume(message);
+                await resume(message);
                 return;
             case 'skip':
-                skip(message);
+                await skip(message);
                 return;
             case 'leave':
-                leave(message);
+                await leave(message);
+                return;
+            case 'prefix':
+                const newPrefix = await changePrefix(message, args);
+                if (newPrefix) {
+                    prefix = newPrefix;
+                }
+                return;
+            case 'help':
+                await help(message, prefix);
                 return;
             default:
                 return;
