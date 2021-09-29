@@ -1,6 +1,6 @@
 const { createAudioPlayer, AudioPlayerStatus, VoiceConnectionStatus, entersState, VoiceConnectionDisconnectReason } = require('@discordjs/voice');
 
-const DEBUG = true;
+const DEBUG = false;
 
 const waitTimeout = 15e3;
 
